@@ -8,12 +8,5 @@
     { "src": "/", "dest": "/api/index.php" },
     { "src": "/koneksi.php", "dest": "/api/koneksi.php" },
     { "src": "/(.*\\.php)", "dest": "/api/$1" }
-  ],
-  "env": {
-    "TIDB_HOST": "@tidb_host",
-    "TIDB_USER": "@tidb_user",
-    "TIDB_PASS": "@tidb_pass",
-    "TIDB_DB": "@tidb_db",
-    "TIDB_PORT": "@tidb_port"
-  }
+  ]
 }
