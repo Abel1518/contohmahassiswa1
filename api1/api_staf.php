@@ -1,7 +1,7 @@
 <?php
 
 header("Content-Type: application/json");
-include "db.php";
+include "koneksi.php";
 
 $method = $_SERVER['REQUEST_METHOD'];
 
