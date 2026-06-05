@@ -9,12 +9,12 @@
   },
   "routes": [
     { "src": "/", "dest": "/api/index.php" },
-    { "src": "/koneksi.php", "dest": "/api/koneksi.php" },
+
     { "src": "/(.*\\.php)", "dest": "/api/$1" },
 
-    { "src": "/mahasiswa", "dest": "/api1/api_mahasiswa.php" },
-    { "src": "/periode", "dest": "/api1/api_periode.php" },
-    { "src": "/staf", "dest": "/api1/api_staf.php" },
-    { "src": "/pendaftaran", "dest": "/api1/api_pendaftaran.php" }
+    { "src": "/wisuda/mahasiswa", "dest": "/api1/api_mahasiswa.php" },
+    { "src": "/wisuda/periode", "dest": "/api1/api_periode.php" },
+    { "src": "/wisuda/staf", "dest": "/api1/api_staf.php" },
+    { "src": "/wisuda/pendaftaran", "dest": "/api1/api_pendaftaran.php" }
   ]
 }
