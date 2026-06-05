@@ -1,4 +1,16 @@
 <?php
+
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 include "koneksi.php";
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -12,16 +24,35 @@ case "GET":
 
     $data=[];
 
-    while($row=$result->fetch_assoc()){
-        $data[]=$row;
+    if ($result) {
+        while($row=$result->fetch_assoc()){
+            $data[]=$row;
+        }
     }
 
-    echo json_encode($data);
+    echo json_encode([
+        "status" => true,
+        "message" => "Data periode berhasil diambil",
+        "total_data" => count($data),
+        "data" => $data
+    ], JSON_PRETTY_PRINT);
 break;
 
 case "POST":
 
     $input=json_decode(file_get_contents("php://input"),true);
+
+    if (
+        empty($input['tahun_periode']) ||
+        empty($input['tanggal_pelaksanaan']) ||
+        empty($input['kuota_maksimal'])
+    ) {
+        echo json_encode([
+            "status" => false,
+            "message" => "Semua data wajib diisi"
+        ], JSON_PRETTY_PRINT);
+        exit;
+    }
 
     $stmt=$conn->prepare(
         "INSERT INTO tabel_periode_wisuda
@@ -36,17 +67,35 @@ case "POST":
         $input['kuota_maksimal']
     );
 
-    $stmt->execute();
-
-    echo json_encode([
-        "status"=>true,
-        "message"=>"Data periode berhasil ditambahkan"
-    ]);
+    if ($stmt->execute()) {
+        echo json_encode([
+            "status"=>true,
+            "message"=>"Data periode berhasil ditambahkan"
+        ], JSON_PRETTY_PRINT);
+    } else {
+        echo json_encode([
+            "status"=>false,
+            "message"=>$stmt->error
+        ], JSON_PRETTY_PRINT);
+    }
 break;
 
 case "PUT":
 
     $input=json_decode(file_get_contents("php://input"),true);
+
+    if (
+        empty($input['id_periode']) ||
+        empty($input['tahun_periode']) ||
+        empty($input['tanggal_pelaksanaan']) ||
+        empty($input['kuota_maksimal'])
+    ) {
+        echo json_encode([
+            "status" => false,
+            "message" => "Semua data wajib diisi"
+        ], JSON_PRETTY_PRINT);
+        exit;
+    }
 
     $stmt=$conn->prepare(
         "UPDATE tabel_periode_wisuda
@@ -64,17 +113,30 @@ case "PUT":
         $input['id_periode']
     );
 
-    $stmt->execute();
-
-    echo json_encode([
-        "status"=>true,
-        "message"=>"Data periode berhasil diubah"
-    ]);
+    if ($stmt->execute()) {
+        echo json_encode([
+            "status"=>true,
+            "message"=>"Data periode berhasil diubah"
+        ], JSON_PRETTY_PRINT);
+    } else {
+        echo json_encode([
+            "status"=>false,
+            "message"=>$stmt->error
+        ], JSON_PRETTY_PRINT);
+    }
 break;
 
 case "DELETE":
 
     $input=json_decode(file_get_contents("php://input"),true);
+
+    if (empty($input['id_periode'])) {
+        echo json_encode([
+            "status" => false,
+            "message" => "ID periode wajib diisi"
+        ], JSON_PRETTY_PRINT);
+        exit;
+    }
 
     $stmt=$conn->prepare(
         "DELETE FROM tabel_periode_wisuda
@@ -86,12 +148,26 @@ case "DELETE":
         $input['id_periode']
     );
 
-    $stmt->execute();
+    if ($stmt->execute()) {
+        echo json_encode([
+            "status"=>true,
+            "message"=>"Data periode berhasil dihapus"
+        ], JSON_PRETTY_PRINT);
+    } else {
+        echo json_encode([
+            "status"=>false,
+            "message"=>$stmt->error
+        ], JSON_PRETTY_PRINT);
+    }
+break;
 
+default:
     echo json_encode([
-        "status"=>true,
-        "message"=>"Data periode berhasil dihapus"
-    ]);
+        "status" => false,
+        "message" => "Method tidak didukung"
+    ], JSON_PRETTY_PRINT);
 break;
 }
+
+$conn->close();
 ?>
